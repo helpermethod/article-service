@@ -27,19 +27,15 @@ public class ArticleService {
 	}
 
 	public Article save(Article article) {
-		Article savedArticle = articleRepository.save(article);
+		kafkaTemplate.send("articles", randomUUID().toString(), new ArticleDto("create", articleRepository.save(article)));
 
-		kafkaTemplate.send("articles", randomUUID().toString(), new ArticleDto("create", savedArticle.getName(), savedArticle.getDescription(), article.getPrice()));
-
-		return savedArticle;
+		return articleRepository.save(article);
 	}
 
 	public void update(Long id, Article article) {
 		article.setId(id);
 
-		Article savedArticle = articleRepository.save(article);
-
-		kafkaTemplate.send("articles", randomUUID().toString(), new ArticleDto("update", savedArticle.getName(), savedArticle.getDescription(), article.getPrice()));
+		kafkaTemplate.send("articles", randomUUID().toString(), new ArticleDto("update", articleRepository.save(article)));
 	}
 
 	public void delete(Long id) {

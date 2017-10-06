@@ -1,13 +1,12 @@
 package com.predic8.workshop.dto;
 
+import com.predic8.workshop.entity.Article;
 import lombok.Data;
-
-import java.math.BigDecimal;
+import lombok.experimental.Delegate;
 
 @Data
 public class ArticleDto {
 	private final String operation;
-	private final String name;
-	private final String description;
-	private final BigDecimal price;
+	@Delegate
+	private final Article article;
 }
