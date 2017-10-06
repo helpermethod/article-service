@@ -2,43 +2,46 @@ package com.predic8.workshop.service;
 
 import com.predic8.workshop.dto.ArticleDto;
 import com.predic8.workshop.entity.Article;
+import com.predic8.workshop.error.NotFoundException;
+import com.predic8.workshop.event.ArticleEvent;
 import com.predic8.workshop.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.UUID.randomUUID;
 
 @RequiredArgsConstructor
 @Service
 public class ArticleService {
-	private final KafkaTemplate<String, ArticleDto> kafkaTemplate;
+	private final KafkaTemplate<String, ArticleEvent> kafkaTemplate;
 	private final ArticleRepository articleRepository;
 
 	public List<Article> index() {
 		return articleRepository.findAll();
 	}
 
-	public Optional<Article> show(Long id) {
-		return Optional.ofNullable(articleRepository.findOne(id));
+	public Article show(String id) {
+		return articleRepository.findByUuid(id).orElseThrow(NotFoundException::new);
 	}
 
-	public Article save(Article article) {
-		kafkaTemplate.send("articles", randomUUID().toString(), new ArticleDto("create", articleRepository.save(article)));
+	public String save(ArticleDto articleDto) {
+		String uuid = randomUUID().toString();
 
-		return articleRepository.save(article);
+		kafkaTemplate.send("articles", uuid, new ArticleEvent("created", articleDto.getName(), articleDto.getDescription(), articleDto.getPrice()));
+
+		return uuid;
 	}
 
-	public void update(Long id, Article article) {
-		article.setId(id);
+	public void update(String uuid, ArticleDto articleDto) {
+		new ArticleEvent("updated", articleDto.getName(), articleDto.getDescription(), articleDto.getPrice());
 
-		kafkaTemplate.send("articles", randomUUID().toString(), new ArticleDto("update", articleRepository.save(article)));
+		kafkaTemplate.send("articles", uuid, new ArticleEvent("updated", articleDto.getName(), articleDto.getDescription(), articleDto.getPrice()));
 	}
 
-	public void delete(Long id) {
-		articleRepository.delete(id);
+	public void delete(String uuid) {
+		kafkaTemplate.send("articles", uuid, new ArticleEvent("deleted", null, null, null));
 	}
 }

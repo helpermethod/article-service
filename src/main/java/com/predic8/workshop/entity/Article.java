@@ -13,6 +13,7 @@ public class Article {
 	@Id
 	@GeneratedValue
 	private Long id;
+	private Long uuid;
 	private String name;
 	private String description;
 	private BigDecimal price;

@@ -1,5 +1,6 @@
 package com.predic8.workshop.api;
 
+import com.predic8.workshop.dto.ArticleDto;
 import com.predic8.workshop.entity.Article;
 import com.predic8.workshop.error.NotFoundException;
 import com.predic8.workshop.service.ArticleService;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,29 +29,33 @@ public class ArticleRestController {
 		return articleService.index();
 	}
 
-	@GetMapping("/{id}")
-	public Article show(@PathVariable Long id) {
-		return articleService.show(id).orElseThrow(NotFoundException::new);
+	@GetMapping("/{uuid}")
+	public Article show(@PathVariable String uuid) {
+		return articleService.show(uuid);
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> save(@RequestBody Article article, UriComponentsBuilder uriComponentsBuilder) {
-		URI uri = uriComponentsBuilder.path("/{id}").buildAndExpand(articleService.save(article).getId()).toUri();
+	public ResponseEntity<Void> save(@RequestBody ArticleDto articleDto, UriComponentsBuilder uriComponentsBuilder) {
+		String uuid = articleService.save(articleDto);
+		String uri = uriComponentsBuilder.path("/{uuid}").buildAndExpand(uuid).toUriString();
 
-		return ResponseEntity.created(uri).build();
+		return ResponseEntity
+			.accepted()
+			.header("Location", uri)
+			.build();
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody Article article) {
-		articleService.update(id, article);
+	@PutMapping("/{uuid}")
+	public ResponseEntity<Void> update(@PathVariable String uuid, @RequestBody ArticleDto article) {
+		articleService.update(uuid, article);
 
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.accepted().build();
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		articleService.delete(id);
+	@DeleteMapping("/{uuid}")
+	public ResponseEntity<Void> delete(@PathVariable String uuid) {
+		articleService.delete(uuid);
 
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.accepted().build();
 	}
 }
