@@ -19,7 +19,7 @@ public class ArticleService {
 	public Article save(Article article) {
 		Article savedArticle = articleRepository.save(article);
 
-		kafkaTemplate.send("articles", new ArticleDto("create", savedArticle.getName(), savedArticle.getDescription()));
+		kafkaTemplate.send("articles", new ArticleDto("create", savedArticle.getName(), savedArticle.getDescription(), article.getPrice()));
 
 		return savedArticle;
 	}
