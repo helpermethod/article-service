@@ -1,4 +1,4 @@
-package com.predic8.workshop.rest;
+package com.predic8.workshop.api;
 
 import com.predic8.workshop.entity.Article;
 import com.predic8.workshop.error.NotFoundException;
