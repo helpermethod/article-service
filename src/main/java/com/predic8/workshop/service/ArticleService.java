@@ -12,36 +12,33 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.UUID.randomUUID;
-
 @RequiredArgsConstructor
 @Service
 public class ArticleService {
 	private final KafkaTemplate<String, ArticleEvent> kafkaTemplate;
 	private final ArticleRepository articleRepository;
 
+	// Query
 	public List<Article> index() {
 		return articleRepository.findAll();
 	}
 
+	// Query
 	public Article show(String uuid) {
 		return Optional.ofNullable(articleRepository.findOne(uuid)).orElseThrow(NotFoundException::new);
 	}
 
-	public String save(ArticleDto articleDto) {
-		String uuid = randomUUID().toString();
-
+	// Query
+	public void save(String uuid, ArticleDto articleDto) {
 		kafkaTemplate.send("articles", uuid, new ArticleEvent("created", articleDto.getName(), articleDto.getDescription(), articleDto.getPrice()));
-
-		return uuid;
 	}
 
+	// Command
 	public void update(String uuid, ArticleDto articleDto) {
-		new ArticleEvent("updated", articleDto.getName(), articleDto.getDescription(), articleDto.getPrice());
-
 		kafkaTemplate.send("articles", uuid, new ArticleEvent("updated", articleDto.getName(), articleDto.getDescription(), articleDto.getPrice()));
 	}
 
+	// Command
 	public void delete(String uuid) {
 		kafkaTemplate.send("articles", uuid, new ArticleEvent("deleted", null, null, null));
 	}

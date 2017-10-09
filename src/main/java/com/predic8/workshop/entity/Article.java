@@ -1,28 +1,29 @@
 package com.predic8.workshop.entity;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.math.BigDecimal;
 
-@NoArgsConstructor
-@RequiredArgsConstructor
+// see https://github.com/rzwitserloot/lombok/issues/1389
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 public class Article {
-	@NonNull
 	@Id
 	private String uuid;
-	@NonNull
 	private String name;
-	@NonNull
 	private String description;
-	@NonNull
 	private BigDecimal price;
 }

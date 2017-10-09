@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/articles")
@@ -36,7 +37,8 @@ public class ArticleRestController {
 
 	@PostMapping
 	public ResponseEntity<Void> save(@RequestBody ArticleDto articleDto, UriComponentsBuilder uriComponentsBuilder) {
-		String uuid = articleService.save(articleDto);
+		String uuid = UUID.randomUUID().toString();
+		articleService.save(uuid, articleDto);
 		String uri = uriComponentsBuilder.path("/{uuid}").buildAndExpand(uuid).toUriString();
 
 		return ResponseEntity

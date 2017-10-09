@@ -23,10 +23,6 @@ import java.util.Map;
 public class ArticleServiceApplication {
 	private final KafkaProperties kafkaProperties;
 
-	public static void main(String[] args) {
-		SpringApplication.run(ArticleServiceApplication.class, args);
-	}
-
 	@Bean
 	public Map<String, Object> configs() {
 		HashMap<String, Object> configs = new HashMap<>();
@@ -49,6 +45,11 @@ public class ArticleServiceApplication {
 		ConcurrentKafkaListenerContainerFactory<String, ArticleEvent> factory =
 			new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory());
+
 		return factory;
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(ArticleServiceApplication.class, args);
 	}
 }
